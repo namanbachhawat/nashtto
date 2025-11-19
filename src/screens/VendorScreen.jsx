@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
   Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../components/Button';
@@ -52,22 +51,22 @@ const VendorScreen = ({ navigation, route }) => {
   };
 
   const renderMenuItem = (item) => (
-    <Card key={item.id} style={styles.menuItem}>
-      <View style={styles.itemContent}>
+    <Card key={item.id} className="mb-3 p-4">
+      <View className="flex-row items-center">
         <Image
           source={{ uri: 'https://images.unsplash.com/photo-1648192312898-838f9b322f47?w=100' }}
-          style={styles.itemImage}
+          className="w-[60px] h-[60px] rounded-lg mr-3"
         />
-        <CardContent style={styles.itemDetails}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemCategory}>{item.category}</Text>
-          <Text style={styles.itemPrice}>₹{item.price}</Text>
+        <CardContent className="flex-1 p-0">
+          <Text className="text-base font-semibold text-slate-800 mb-1">{item.name}</Text>
+          <Text className="text-xs text-slate-500 mb-1">{item.category}</Text>
+          <Text className="text-base text-green-500 font-semibold">₹{item.price}</Text>
         </CardContent>
         <Button
           title="Add"
           onPress={() => addToCart(item)}
           size="small"
-          style={styles.addButton}
+          className="bg-green-500 px-4"
         />
       </View>
     </Card>
@@ -75,13 +74,13 @@ const VendorScreen = ({ navigation, route }) => {
 
   if (!vendorData) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Vendor not found</Text>
+      <SafeAreaView className="flex-1 bg-slate-50">
+        <View className="flex-1 px-4 justify-center items-center">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Vendor not found</Text>
           <Button
             title="Go Back"
             onPress={() => navigation.goBack()}
-            style={styles.backButton}
+            className="w-full"
           />
         </View>
       </SafeAreaView>
@@ -89,222 +88,59 @@ const VendorScreen = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center px-4 py-3 bg-white border-b border-slate-200">
         <TouchableOpacity
-          style={styles.backButton}
+          className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text className="text-lg text-slate-500">←</Text>
         </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle} numberOfLines={1}>{vendorData.name}</Text>
-          <Text style={styles.headerSubtitle}>⭐ {vendorData.rating} • {vendorData.time}</Text>
+        <View className="flex-1 ml-3">
+          <Text className="text-lg font-bold text-slate-800" numberOfLines={1}>{vendorData.name}</Text>
+          <Text className="text-xs text-slate-500 mt-0.5">⭐ {vendorData.rating} • {vendorData.time}</Text>
         </View>
         <TouchableOpacity
-          style={styles.cartButton}
+          className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
           onPress={() => navigation.navigate('Cart')}
         >
-          <Text style={styles.cartIcon}>🛒</Text>
+          <Text className="text-lg">🛒</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Vendor Info */}
-        <View style={styles.vendorInfo}>
-          <Image source={{ uri: vendorData.image }} style={styles.vendorImage} />
-          <View style={styles.vendorDetails}>
-            <Text style={styles.vendorName}>{vendorData.name}</Text>
-            <Text style={styles.vendorMeta}>
+        <View className="bg-white rounded-xl p-4 mt-4 flex-row">
+          <Image source={{ uri: vendorData.image }} className="w-20 h-20 rounded-lg" />
+          <View className="flex-1 ml-3">
+            <Text className="text-xl font-bold text-slate-800 mb-1">{vendorData.name}</Text>
+            <Text className="text-sm text-slate-500 mb-1">
               ⭐ {vendorData.rating} • {vendorData.time} • {vendorData.distance}
             </Text>
-            <Text style={styles.vendorOffers}>{vendorData.offers}</Text>
-            <Text style={styles.vendorPrice}>{vendorData.price}</Text>
-            <Text style={styles.vendorDescription}>{vendorData.description}</Text>
+            <Text className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded self-start mb-1 font-semibold">{vendorData.offers}</Text>
+            <Text className="text-sm text-slate-500 mb-1">{vendorData.price}</Text>
+            <Text className="text-sm text-slate-500 leading-5">{vendorData.description}</Text>
           </View>
         </View>
 
         {/* Menu Categories */}
-        <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>Menu</Text>
+        <View className="mt-6">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Menu</Text>
 
           {menu.length === 0 ? (
-            <View style={styles.emptyMenu}>
-              <Text style={styles.emptyText}>No menu items available</Text>
+            <View className="items-center p-8">
+              <Text className="text-base text-slate-500">No menu items available</Text>
             </View>
           ) : (
             menu.map(renderMenuItem)
           )}
         </View>
 
-        <View style={styles.bottomPadding} />
+        <View className="h-5" />
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: '#64748b',
-  },
-  headerInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: '#64748b',
-    marginTop: 2,
-  },
-  cartButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cartIcon: {
-    fontSize: 18,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  vendorInfo: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
-    flexDirection: 'row',
-  },
-  vendorImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-  },
-  vendorDetails: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  vendorName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  vendorMeta: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 4,
-  },
-  vendorOffers: {
-    fontSize: 12,
-    backgroundColor: '#dcfce7',
-    color: '#16a34a',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
-    marginBottom: 4,
-    fontWeight: '600',
-  },
-  vendorPrice: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 4,
-  },
-  vendorDescription: {
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 20,
-  },
-  menuSection: {
-    marginTop: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  menuItem: {
-    marginBottom: 12,
-    padding: 16,
-  },
-  itemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  itemDetails: {
-    flex: 1,
-    padding: 0,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  itemCategory: {
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 4,
-  },
-  itemPrice: {
-    fontSize: 16,
-    color: '#22c55e',
-    fontWeight: '600',
-  },
-  addButton: {
-    backgroundColor: '#22c55e',
-    paddingHorizontal: 16,
-  },
-  emptyMenu: {
-    alignItems: 'center',
-    padding: 32,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#64748b',
-  },
-  bottomPadding: {
-    height: 20,
-  },
-});
 
 export default VendorScreen;

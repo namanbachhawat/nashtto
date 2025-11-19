@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Alert,
+  ScrollView,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../components/Button';
@@ -14,333 +13,161 @@ import { Card, CardContent } from '../components/Card';
 import api from '../services/api';
 
 const SupportScreen = ({ navigation }) => {
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [category, setCategory] = useState('general');
   const [loading, setLoading] = useState(false);
 
-  const supportCategories = [
-    { id: 'order', name: 'Order Issues', icon: '📦' },
-    { id: 'payment', name: 'Payment Problems', icon: '💳' },
-    { id: 'delivery', name: 'Delivery Issues', icon: '🚚' },
-    { id: 'account', name: 'Account Help', icon: '👤' },
-    { id: 'app', name: 'App Feedback', icon: '📱' },
-    { id: 'other', name: 'Other', icon: '❓' },
+  const categories = [
+    { id: 'general', label: 'General Inquiry', icon: '❓' },
+    { id: 'order', label: 'Order Issue', icon: '📦' },
+    { id: 'payment', label: 'Payment', icon: '💳' },
+    { id: 'technical', label: 'App Issue', icon: '📱' },
   ];
 
   const faqs = [
     {
       question: 'How do I track my order?',
-      answer: 'You can track your order in real-time from the Orders section. Click on any active order to see its current status and estimated delivery time.'
+      answer: 'Go to the "Orders" tab and select your active order to view real-time tracking.',
     },
     {
-      question: 'What are your delivery hours?',
-      answer: 'We deliver from 8:00 AM to 10:00 PM daily. Peak hours are between 12:00 PM - 2:00 PM and 7:00 PM - 9:00 PM.'
+      question: 'Can I cancel my order?',
+      answer: 'You can cancel your order within 5 minutes of placing it. After that, please contact support.',
     },
     {
-      question: 'How do I cancel my order?',
-      answer: 'You can cancel your order within 2 minutes of placing it. Go to Orders > Active Orders > Cancel Order.'
-    },
-    {
-      question: 'What is your refund policy?',
-      answer: 'We offer full refunds for cancelled orders and partial refunds for unsatisfactory deliveries. Refunds are processed within 3-5 business days.'
+      question: 'How do I change my payment method?',
+      answer: 'You can manage your payment methods in Profile > Payment Methods.',
     },
   ];
 
-  const handleSubmitTicket = async () => {
-    if (!selectedCategory || !subject.trim() || !message.trim()) {
-      Alert.alert('Missing Information', 'Please fill in all required fields');
+  const handleSubmit = async () => {
+    if (!subject.trim() || !message.trim()) {
+      Alert.alert('Missing Information', 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
     try {
       const response = await api.submitSupportTicket({
-        category: selectedCategory,
-        subject: subject.trim(),
-        message: message.trim(),
+        category,
+        subject,
+        message,
       });
 
       if (response.success) {
         Alert.alert(
           'Ticket Submitted',
-          `Your support ticket has been submitted successfully. Ticket ID: ${response.ticketId}`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                setSelectedCategory('');
-                setSubject('');
-                setMessage('');
-              }
-            }
-          ]
+          'We have received your message and will get back to you shortly.',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
         );
-      } else {
-        Alert.alert('Error', 'Failed to submit support ticket. Please try again.');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to submit support ticket. Please check your connection and try again.');
+      Alert.alert('Error', 'Failed to submit ticket. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const renderCategory = (category) => (
-    <TouchableOpacity
-      key={category.id}
-      style={[
-        styles.categoryItem,
-        selectedCategory === category.id && styles.selectedCategory,
-      ]}
-      onPress={() => setSelectedCategory(category.id)}
-    >
-      <Text style={styles.categoryIcon}>{category.icon}</Text>
-      <Text style={[
-        styles.categoryName,
-        selectedCategory === category.id && styles.selectedCategoryText,
-      ]}>
-        {category.name}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderFAQ = (faq, index) => (
-    <Card key={index} style={styles.faqCard}>
-      <CardContent>
-        <Text style={styles.faqQuestion}>{faq.question}</Text>
-        <Text style={styles.faqAnswer}>{faq.answer}</Text>
-      </CardContent>
-    </Card>
-  );
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-slate-200">
         <TouchableOpacity
-          style={styles.backButton}
+          className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text className="text-lg text-slate-500">←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Support Center</Text>
-        <View style={{ width: 40 }} />
+        <Text className="text-lg font-bold text-slate-800">Help & Support</Text>
+        <View className="w-10" />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Quick Contact */}
-        <View style={styles.quickContact}>
-          <Text style={styles.sectionTitle}>Get in Touch</Text>
-          <View style={styles.contactOptions}>
-            <TouchableOpacity style={styles.contactOption}>
-              <Text style={styles.contactIcon}>📞</Text>
-              <Text style={styles.contactText}>Call Us</Text>
+        <View className="mt-4">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Quick Contact</Text>
+          <View className="flex-row justify-around">
+            <TouchableOpacity className="items-center p-4 bg-white rounded-xl w-20">
+              <Text className="text-2xl mb-2">📞</Text>
+              <Text className="text-xs text-slate-500 text-center">Call Us</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactOption}>
-              <Text style={styles.contactIcon}>💬</Text>
-              <Text style={styles.contactText}>Live Chat</Text>
+            <TouchableOpacity className="items-center p-4 bg-white rounded-xl w-20">
+              <Text className="text-2xl mb-2">💬</Text>
+              <Text className="text-xs text-slate-500 text-center">Chat</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactOption}>
-              <Text style={styles.contactIcon}>✉️</Text>
-              <Text style={styles.contactText}>Email</Text>
+            <TouchableOpacity className="items-center p-4 bg-white rounded-xl w-20">
+              <Text className="text-2xl mb-2">📧</Text>
+              <Text className="text-xs text-slate-500 text-center">Email</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Support Form */}
-        <View style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Submit a Ticket</Text>
+        {/* Contact Form */}
+        <View className="mt-6">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Send us a message</Text>
 
-          <View style={styles.categoriesGrid}>
-            {supportCategories.map(renderCategory)}
+          <View className="flex-row flex-wrap gap-2 mb-4">
+            {categories.map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                className={`flex-row items-center px-4 py-3 bg-white rounded-xl border border-slate-200 flex-1 min-w-[45%] ${category === cat.id ? 'bg-green-50 border-green-500' : ''
+                  }`}
+                onPress={() => setCategory(cat.id)}
+              >
+                <Text className="text-lg mr-2">{cat.icon}</Text>
+                <Text className={`text-sm font-medium ${category === cat.id ? 'text-green-600' : 'text-slate-500'
+                  }`}>
+                  {cat.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           <TextInput
-            style={styles.subjectInput}
+            className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800 mb-3"
             placeholder="Subject"
             value={subject}
             onChangeText={setSubject}
-            placeholderTextColor="#64748b"
+            placeholderTextColor="#94a3b8"
           />
 
           <TextInput
-            style={[styles.messageInput, { height: 120 }]}
-            placeholder="Describe your issue in detail..."
+            className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800 mb-4"
+            placeholder="Describe your issue..."
             value={message}
             onChangeText={setMessage}
             multiline
+            numberOfLines={4}
             textAlignVertical="top"
-            placeholderTextColor="#64748b"
+            placeholderTextColor="#94a3b8"
+            style={{ height: 120 }}
           />
 
           <Button
             title="Submit Ticket"
-            onPress={handleSubmitTicket}
+            onPress={handleSubmit}
             loading={loading}
-            style={styles.submitButton}
+            className="bg-green-500"
           />
         </View>
 
         {/* FAQs */}
-        <View style={styles.faqSection}>
-          <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
-          {faqs.map(renderFAQ)}
+        <View className="mt-6">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Frequently Asked Questions</Text>
+          {faqs.map((faq, index) => (
+            <Card key={index} className="mb-3">
+              <CardContent>
+                <Text className="text-base font-semibold text-slate-800 mb-2">{faq.question}</Text>
+                <Text className="text-sm text-slate-500 leading-5">{faq.answer}</Text>
+              </CardContent>
+            </Card>
+          ))}
         </View>
 
-        <View style={styles.bottomPadding} />
+        <View className="h-5" />
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: '#64748b',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  quickContact: {
-    marginTop: 16,
-  },
-  contactOptions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  contactOption: {
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    width: 80,
-  },
-  contactIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  contactText: {
-    fontSize: 12,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  formSection: {
-    marginTop: 24,
-  },
-  categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-  },
-  categoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    flex: 1,
-    minWidth: '45%',
-  },
-  selectedCategory: {
-    backgroundColor: '#dcfce7',
-    borderColor: '#22c55e',
-  },
-  categoryIcon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  categoryName: {
-    fontSize: 14,
-    color: '#64748b',
-    fontWeight: '500',
-  },
-  selectedCategoryText: {
-    color: '#16a34a',
-  },
-  subjectInput: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#1e293b',
-    marginBottom: 12,
-  },
-  messageInput: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  submitButton: {
-    backgroundColor: '#22c55e',
-  },
-  faqSection: {
-    marginTop: 24,
-  },
-  faqCard: {
-    marginBottom: 12,
-  },
-  faqQuestion: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  faqAnswer: {
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 20,
-  },
-  bottomPadding: {
-    height: 20,
-  },
-});
 
 export default SupportScreen;

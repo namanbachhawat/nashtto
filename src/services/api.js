@@ -204,6 +204,72 @@ class ApiService {
     return { success: false, error: 'Vendor not found' };
   }
 
+  async getMenuItem(itemId) {
+    await this.delay(400);
+    let foundItem = null;
+    let foundVendor = null;
+
+    for (const vendor of this.mockData.vendors) {
+      const item = vendor.menu.find(i => i.id === parseInt(itemId));
+      if (item) {
+        foundItem = item;
+        foundVendor = vendor;
+        break;
+      }
+    }
+
+    if (foundItem) {
+      return {
+        success: true,
+        item: {
+          ...foundItem,
+          vendorName: foundVendor.name,
+          vendorId: foundVendor.id,
+          vendorRating: foundVendor.rating
+        }
+      };
+    }
+    return { success: false, error: 'Item not found' };
+  }
+
+  async getMenuItems(params = {}) {
+    await this.delay(600);
+    const { category, vegOnly, rating, priceRange } = params;
+    let allItems = [];
+
+    // Helper to check if item is veg
+    const isVeg = (name) => !name.toLowerCase().includes('chicken') && !name.toLowerCase().includes('fish');
+
+    this.mockData.vendors.forEach(vendor => {
+      // Filter by vendor rating if provided
+      if (rating && vendor.rating < rating) return;
+
+      vendor.menu.forEach(item => {
+        // Filter by category
+        if (category && category !== 'all' && item.category.toLowerCase() !== category.toLowerCase()) return;
+
+        // Filter by veg/non-veg
+        if (vegOnly && !isVeg(item.name)) return;
+
+        // Filter by price range
+        if (priceRange) {
+          if (priceRange === 'under_100' && item.price >= 100) return;
+          if (priceRange === '100_300' && (item.price < 100 || item.price > 300)) return;
+          if (priceRange === 'over_300' && item.price <= 300) return;
+        }
+
+        allItems.push({
+          ...item,
+          vendorName: vendor.name,
+          vendorId: vendor.id,
+          vendorRating: vendor.rating
+        });
+      });
+    });
+
+    return { success: true, items: allItems };
+  }
+
   // Cart
   async getCart() {
     await this.delay(400);
@@ -387,21 +453,49 @@ class ApiService {
   // Search
   async search(params) {
     await this.delay(700);
-    const { query, category, location } = params;
+    const { query, category, location, rating, vegOnly, priceRange } = params;
     let results = [];
 
+    // Helper to check if item is veg (mock logic: if not 'Chicken' or 'Fish' in name)
+    const isVeg = (name) => !name.toLowerCase().includes('chicken') && !name.toLowerCase().includes('fish');
+
     // Search in vendors
-    const vendorResults = this.mockData.vendors.filter(vendor =>
-      vendor.name.toLowerCase().includes(query?.toLowerCase() || '') ||
-      vendor.menu.some(item => item.name.toLowerCase().includes(query?.toLowerCase() || ''))
-    );
+    const vendorResults = this.mockData.vendors.filter(vendor => {
+      const matchesQuery = vendor.name.toLowerCase().includes(query?.toLowerCase() || '') ||
+        vendor.menu.some(item => item.name.toLowerCase().includes(query?.toLowerCase() || ''));
+
+      const matchesCategory = !category || category === 'all' ||
+        vendor.menu.some(item => item.category.toLowerCase() === category.toLowerCase());
+
+      const matchesRating = !rating || vendor.rating >= rating;
+
+      // For vendors, we check if they have ANY veg items if vegOnly is true
+      const matchesVeg = !vegOnly || vendor.menu.some(item => isVeg(item.name));
+
+      return matchesQuery && matchesCategory && matchesRating && matchesVeg;
+    });
 
     // Search in menu items
     const menuResults = [];
     this.mockData.vendors.forEach(vendor => {
+      // Skip vendor if it doesn't match vendor-level filters (like rating)
+      if (rating && vendor.rating < rating) return;
+
       vendor.menu.forEach(item => {
-        if (item.name.toLowerCase().includes(query?.toLowerCase() || '')) {
-          menuResults.push({ ...item, vendorName: vendor.name, vendorId: vendor.id });
+        const matchesQuery = item.name.toLowerCase().includes(query?.toLowerCase() || '');
+        const matchesCategory = !category || category === 'all' || item.category.toLowerCase() === category.toLowerCase();
+        const matchesVeg = !vegOnly || isVeg(item.name);
+
+        // Mock price range logic
+        let matchesPrice = true;
+        if (priceRange) {
+          if (priceRange === 'under_100') matchesPrice = item.price < 100;
+          else if (priceRange === '100_300') matchesPrice = item.price >= 100 && item.price <= 300;
+          else if (priceRange === 'over_300') matchesPrice = item.price > 300;
+        }
+
+        if (matchesQuery && matchesCategory && matchesVeg && matchesPrice) {
+          menuResults.push({ ...item, vendorName: vendor.name, vendorId: vendor.id, vendorRating: vendor.rating });
         }
       });
     });
