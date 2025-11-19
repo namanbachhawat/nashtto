@@ -1,5 +1,4 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 
 export const Button = ({
   title,
@@ -8,156 +7,34 @@ export const Button = ({
   size = 'medium',
   loading = false,
   disabled = false,
-  style,
-  textStyle,
+  className,
+  textClassName,
   icon,
 }) => {
-  const getButtonStyle = () => {
-    let buttonStyle = [styles.base];
-    
-    // Add size styles
-    if (size === 'small') buttonStyle.push(styles.small);
-    else if (size === 'large') buttonStyle.push(styles.large);
-    else buttonStyle.push(styles.medium);
-    
-    // Add variant styles
-    if (variant === 'secondary') buttonStyle.push(styles.secondary);
-    else if (variant === 'outline') buttonStyle.push(styles.outline);
-    else if (variant === 'ghost') buttonStyle.push(styles.ghost);
-    else buttonStyle.push(styles.primary);
-    
-    // Add disabled style
-    if (disabled || loading) buttonStyle.push(styles.disabled);
-    
-    // Add custom style
-    if (style) buttonStyle.push(style);
-    
-    return buttonStyle;
-  };
+  const buttonClassName = `flex-row items-center justify-center rounded-xl shadow-sm ${
+    size === 'small' ? 'py-2 px-4 min-h-9 text-xs' : size === 'large' ? 'py-6 px-8 min-h-14 text-lg' : 'py-4 px-6 min-h-12 text-base'
+  } ${
+    variant === 'primary' ? 'bg-green-500 text-white' : variant === 'secondary' ? 'bg-slate-500 text-white' : variant === 'outline' ? 'bg-transparent border border-green-500 text-green-500' : 'bg-transparent text-green-500'
+  } ${disabled || loading ? 'opacity-60' : ''} ${className || ''}`;
 
-  const getTextStyle = () => {
-    let textStyleArray = [styles.text];
-    
-    // Add size text styles
-    if (size === 'small') textStyleArray.push(styles.smallText);
-    else if (size === 'large') textStyleArray.push(styles.largeText);
-    else textStyleArray.push(styles.mediumText);
-    
-    // Add variant text styles
-    if (variant === 'secondary') textStyleArray.push(styles.secondaryText);
-    else if (variant === 'outline') textStyleArray.push(styles.outlineText);
-    else if (variant === 'ghost') textStyleArray.push(styles.ghostText);
-    else textStyleArray.push(styles.primaryText);
-    
-    // Add custom text style
-    if (textStyle) textStyleArray.push(textStyle);
-    
-    return textStyleArray;
-  };
-
-  const getTextColor = () => {
-    switch (variant) {
-      case 'primary':
-        return '#ffffff';
-      case 'secondary':
-        return '#ffffff';
-      case 'outline':
-        return '#22c55e';
-      case 'ghost':
-        return '#22c55e';
-      default:
-        return '#ffffff';
-    }
-  };
+  const textClass = `font-semibold text-center ${
+    variant === 'primary' ? 'text-white' : variant === 'secondary' ? 'text-white' : variant === 'outline' ? 'text-green-500' : 'text-green-500'
+  } ${textClassName || ''}`;
 
   return (
     <TouchableOpacity
-      style={getButtonStyle()}
+      className={buttonClassName}
       onPress={onPress}
       disabled={disabled || loading}
     >
       {loading ? (
-        <ActivityIndicator color={getTextColor()} size="small" />
+        <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? '#22c55e' : '#ffffff'} size="small" />
       ) : (
         <>
           {icon}
-          <Text style={getTextStyle()}>{title}</Text>
+          <Text className={textClass}>{title}</Text>
         </>
       )}
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  small: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    minHeight: 36,
-  },
-  medium: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    minHeight: 48,
-  },
-  large: {
-    paddingVertical: 24,
-    paddingHorizontal: 32,
-    minHeight: 56,
-  },
-  primary: {
-    backgroundColor: '#22c55e',
-  },
-  secondary: {
-    backgroundColor: '#64748b',
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#22c55e',
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  text: {
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  smallText: {
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  mediumText: {
-    fontSize: 16,
-    lineHeight: 20,
-  },
-  largeText: {
-    fontSize: 18,
-    lineHeight: 24,
-  },
-  primaryText: {
-    color: '#ffffff',
-  },
-  secondaryText: {
-    color: '#ffffff',
-  },
-  outlineText: {
-    color: '#22c55e',
-  },
-  ghostText: {
-    color: '#22c55e',
-  },
-});

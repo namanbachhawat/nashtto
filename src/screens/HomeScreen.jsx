@@ -1,8 +1,8 @@
+```javascript
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TextInput,
   TouchableOpacity,
@@ -64,37 +64,37 @@ const HomeScreen = ({ navigation }) => {
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity 
-      style={styles.categoryItem}
+      className="items-center mr-4 w-20"
       onPress={() => handleCategoryPress(item)}
     >
-      <Image source={{ uri: item.image }} style={styles.categoryImage} />
-      <Text style={styles.categoryName}>{item.name}</Text>
-      <Text style={styles.categoryItems}>{item.items} items</Text>
+      <Image source={{ uri: item.image }} className="w-[60px] h-[60px] rounded-full mb-2" />
+      <Text className="text-xs font-semibold text-slate-800 text-center">{item.name}</Text>
+      <Text className="text-[10px] text-slate-500 text-center">{item.items} items</Text>
     </TouchableOpacity>
   );
 
   const renderVendor = ({ item }) => (
     <Card 
-      style={styles.vendorCard}
+      className="mb-3 p-0"
       onPress={() => handleVendorPress(item)}
     >
-      <View style={styles.vendorContent}>
-        <Image source={{ uri: item.image }} style={styles.vendorImage} />
+      <View className="flex-row">
+        <Image source={{ uri: item.image }} className="w-20 h-20 rounded-l-2xl" />
         {item.promoted && (
-          <View style={styles.promotedBadge}>
-            <Text style={styles.promotedText}>Promoted</Text>
+          <View className="absolute top-2 left-2 bg-green-500 rounded px-1.5 py-0.5">
+            <Text className="text-white text-[8px] font-bold">Promoted</Text>
           </View>
         )}
-        <CardContent style={styles.vendorInfo}>
-          <Text style={styles.vendorName}>{item.name}</Text>
-          <View style={styles.vendorMeta}>
-            <Text style={styles.vendorRating}>⭐ {item.rating}</Text>
-            <Text style={styles.vendorTime}>⏰ {item.time}</Text>
-            <Text style={styles.vendorDistance}>• {item.distance}</Text>
+        <CardContent className="flex-1 p-3">
+          <Text className="text-base font-semibold text-slate-800 mb-1">{item.name}</Text>
+          <View className="flex-row items-center mb-2">
+            <Text className="text-xs text-slate-500 mr-3">⭐ {item.rating}</Text>
+            <Text className="text-xs text-slate-500 mr-3">⏰ {item.time}</Text>
+            <Text className="text-xs text-slate-500">• {item.distance}</Text>
           </View>
-          <View style={styles.vendorOffer}>
-            <Text style={styles.offerText}>{item.offers}</Text>
-            <Text style={styles.priceText}>{item.price}</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-[10px] bg-green-100 text-green-600 px-1.5 py-0.5 rounded font-semibold">{item.offers}</Text>
+            <Text className="text-[10px] text-slate-500">{item.price}</Text>
           </View>
         </CardContent>
       </View>
@@ -102,113 +102,113 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.addressContainer}>
-          <View style={styles.locationIcon}>
-            <Text style={styles.locationIconText}>📍</Text>
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white">
+        <View className="flex-row items-center flex-1">
+          <View className="w-8 h-8 bg-green-100 rounded-lg items-center justify-center mr-3">
+            <Text className="text-base">📍</Text>
           </View>
           <View>
-            <Text style={styles.deliverToText}>Deliver to</Text>
-            <View style={styles.addressRow}>
-              <Text style={styles.addressName}>{addresses[selectedAddress]?.name || 'Home'}</Text>
-              <Text style={styles.addressText}>• {addresses[selectedAddress]?.address || 'Loading address...'}</Text>
+            <Text className="text-xs text-slate-500">Deliver to</Text>
+            <View className="flex-row items-center">
+              <Text className="text-sm font-semibold text-slate-800">{addresses[selectedAddress]?.name || 'Home'}</Text>
+              <Text className="text-sm text-slate-500 ml-1">• {addresses[selectedAddress]?.address || 'Loading address...'}</Text>
             </View>
           </View>
         </View>
         
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionIcon}>👤</Text>
+        <View className="flex-row gap-2">
+          <TouchableOpacity className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center relative">
+            <Text className="text-lg">👤</Text>
           </TouchableOpacity>
           <TouchableOpacity 
-            style={styles.actionButton}
+            className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center relative"
             onPress={() => navigation.navigate('Support')}
           >
-            <Text style={styles.actionIcon}>🔔</Text>
+            <Text className="text-lg">🔔</Text>
             {unreadNotificationsCount > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationText}>{unreadNotificationsCount}</Text>
+              <View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 items-center justify-center">
+                <Text className="text-white text-[10px] font-bold">{unreadNotificationsCount}</Text>
               </View>
             )}
           </TouchableOpacity>
           <TouchableOpacity 
-            style={styles.actionButton}
+            className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center relative"
             onPress={() => navigation.navigate('Cart')}
           >
-            <Text style={styles.actionIcon}>💰</Text>
+            <Text className="text-lg">💰</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Search Bar */}
-      <TouchableOpacity style={styles.searchContainer} onPress={handleSearch}>
-        <Text style={styles.searchIcon}>🔍</Text>
+      <TouchableOpacity className="flex-row items-center bg-slate-100 mx-4 my-3 rounded-xl px-4 py-3" onPress={handleSearch}>
+        <Text className="text-lg mr-3">🔍</Text>
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 text-base text-slate-800"
           placeholder="Search for food, drinks, vendors..."
           value={searchText}
           onChangeText={setSearchText}
           onSubmitEditing={handleSearch}
         />
-        <Text style={styles.micIcon}>🎤</Text>
+        <Text className="text-lg">🎤</Text>
       </TouchableOpacity>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Welcome Offer */}
-        <View style={styles.offerCard}>
-          <View style={styles.offerContent}>
-            <View style={styles.offerTextContainer}>
-              <Text style={styles.offerTitle}>Welcome Offer!</Text>
-              <Text style={styles.offerSubtitle}>
+        <View className="rounded-2xl p-5 mb-5 bg-green-500">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-white">Welcome Offer!</Text>
+              <Text className="text-sm text-green-50 mt-1">
                 Get 40% off on your first 3 orders with code NASHTO40
               </Text>
             </View>
-            <Button title="Claim" size="small" style={styles.claimButton} />
+            <Button title="Claim" size="small" className="bg-white px-4" textClassName="text-green-500" />
           </View>
         </View>
 
         {/* Categories */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Shop by category</Text>
+        <View className="mb-6">
+          <Text className="text-lg font-bold text-slate-800 mb-3">Shop by category</Text>
           <FlatList
             data={categories}
             renderItem={renderCategory}
             keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesList}
+            contentContainerClassName="py-2"
           />
         </View>
 
         {/* Order Again */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Order again</Text>
+        <View className="mb-6">
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-lg font-bold text-slate-800">Order again</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAllText}>See all</Text>
+              <Text className="text-sm text-green-500 font-semibold">See all</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {['Masala Chai', 'Samosa', 'Filter Coffee', 'Dhokla'].map((item, index) => (
-              <View key={index} style={styles.orderAgainItem}>
-                <View style={styles.orderAgainImage} />
-                <Text style={styles.orderAgainName}>{item}</Text>
-                <Text style={styles.orderAgainVendor}>Green Tea House</Text>
-                <Text style={styles.orderAgainPrice}>₹25</Text>
-                <Button title="Add" size="small" style={styles.addButton} />
+              <View key={index} className="w-28 bg-white rounded-xl p-3 mr-3 items-center">
+                <View className="w-20 h-20 bg-slate-100 rounded-xl mb-2" />
+                <Text className="text-xs font-semibold text-slate-800 text-center">{item}</Text>
+                <Text className="text-[10px] text-slate-500 text-center">Green Tea House</Text>
+                <Text className="text-xs font-semibold text-slate-800 my-1">₹25</Text>
+                <Button title="Add" size="small" className="bg-green-500 px-3 py-1" />
               </View>
             ))}
           </ScrollView>
         </View>
 
         {/* Popular Stores */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Popular stores near you</Text>
+        <View className="mb-6">
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-lg font-bold text-slate-800">Popular stores near you</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAllText}>See all ›</Text>
+              <Text className="text-sm text-green-500 font-semibold">See all ›</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -219,303 +219,11 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
 
-        <View style={styles.bottomPadding} />
+        <View className="h-5" />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-  },
-  addressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  locationIcon: {
-    width: 32,
-    height: 32,
-    backgroundColor: '#dcfce7',
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  locationIconText: {
-    fontSize: 16,
-  },
-  deliverToText: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  addressName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  addressText: {
-    fontSize: 14,
-    color: '#64748b',
-    marginLeft: 4,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  actionIcon: {
-    fontSize: 18,
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: '#ef4444',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notificationText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f1f5f9',
-    marginHorizontal: 16,
-    marginVertical: 12,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  searchIcon: {
-    fontSize: 18,
-    marginRight: 12,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  micIcon: {
-    fontSize: 18,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  offerCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-  },
-  offerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  offerTextContainer: {
-    flex: 1,
-  },
-  offerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  offerSubtitle: {
-    fontSize: 14,
-    color: '#f0fdf4',
-    marginTop: 4,
-  },
-  claimButton: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 16,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: '#22c55e',
-    fontWeight: '600',
-  },
-  categoriesList: {
-    paddingVertical: 8,
-  },
-  categoryItem: {
-    alignItems: 'center',
-    marginRight: 16,
-    width: 80,
-  },
-  categoryImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 8,
-  },
-  categoryName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1e293b',
-    textAlign: 'center',
-  },
-  categoryItems: {
-    fontSize: 10,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  orderAgainItem: {
-    width: 120,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 12,
-    marginRight: 12,
-    alignItems: 'center',
-  },
-  orderAgainImage: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#f1f5f9',
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  orderAgainName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1e293b',
-    textAlign: 'center',
-  },
-  orderAgainVendor: {
-    fontSize: 10,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  orderAgainPrice: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginVertical: 4,
-  },
-  addButton: {
-    backgroundColor: '#22c55e',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  vendorCard: {
-    marginBottom: 12,
-    padding: 0,
-  },
-  vendorContent: {
-    flexDirection: 'row',
-  },
-  vendorImage: {
-    width: 80,
-    height: 80,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-  },
-  promotedBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: '#22c55e',
-    borderRadius: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  promotedText: {
-    color: '#ffffff',
-    fontSize: 8,
-    fontWeight: 'bold',
-  },
-  vendorInfo: {
-    flex: 1,
-    padding: 12,
-  },
-  vendorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  vendorMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  vendorRating: {
-    fontSize: 12,
-    color: '#64748b',
-    marginRight: 12,
-  },
-  vendorTime: {
-    fontSize: 12,
-    color: '#64748b',
-    marginRight: 12,
-  },
-  vendorDistance: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  vendorOffer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  offerText: {
-    fontSize: 10,
-    backgroundColor: '#dcfce7',
-    color: '#16a34a',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    fontWeight: '600',
-  },
-  priceText: {
-    fontSize: 10,
-    color: '#64748b',
-  },
-  bottomPadding: {
-    height: 20,
-  },
-});
-
 export default HomeScreen;
+```

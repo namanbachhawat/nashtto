@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
+  Alert,
   FlatList,
   Image,
-  Alert,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../components/Button';
@@ -20,6 +20,14 @@ const SearchScreen = ({ navigation, route }) => {
   const [results, setResults] = useState({ vendors: [], items: [] });
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
+
+  // Filter States
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    rating: null,
+    vegOnly: false,
+    priceRange: null, // 'under_100', '100_300', 'over_300'
+  });
 
   const { searchQuery: initialQuery, category } = route.params || {};
 
@@ -42,14 +50,20 @@ const SearchScreen = ({ navigation, route }) => {
     { id: 'desserts', name: 'Desserts', icon: '🍰' },
   ];
 
-  const performSearch = async (query = searchQuery, categoryFilter = selectedCategory) => {
-    if (!query.trim() && !categoryFilter) return;
+  const performSearch = async (query = searchQuery, categoryFilter = selectedCategory, activeFilters = filters) => {
+    // Allow search if there are filters, even if query is empty
+    if (!query.trim() && !categoryFilter && !activeFilters.rating && !activeFilters.vegOnly && !activeFilters.priceRange) return;
 
     setLoading(true);
     try {
       const params = {};
       if (query.trim()) params.query = query;
       if (categoryFilter && categoryFilter !== 'all') params.category = categoryFilter;
+
+      // Add filters to params
+      if (activeFilters.rating) params.rating = activeFilters.rating;
+      if (activeFilters.vegOnly) params.vegOnly = true;
+      if (activeFilters.priceRange) params.priceRange = activeFilters.priceRange;
 
       const response = await api.search(params);
       if (response.success) {
@@ -69,10 +83,16 @@ const SearchScreen = ({ navigation, route }) => {
   const handleCategoryPress = (categoryId) => {
     setSelectedCategory(categoryId);
     if (categoryId === 'all') {
-      performSearch(searchQuery);
+      performSearch(searchQuery, 'all');
     } else {
       performSearch(searchQuery, categoryId);
     }
+  };
+
+  const applyFilters = (newFilters) => {
+    setFilters(newFilters);
+    setShowFilters(false);
+    performSearch(searchQuery, selectedCategory, newFilters);
   };
 
   const handleVendorPress = (vendor) => {
@@ -92,108 +112,235 @@ const SearchScreen = ({ navigation, route }) => {
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity
-      style={[
-        styles.categoryItem,
-        selectedCategory === item.id && styles.selectedCategory,
-      ]}
+      className={`items-center mr-4 px-4 py-2 bg-white rounded-full border border-slate-200 ${selectedCategory === item.id ? 'bg-green-500 border-green-500' : ''}`}
       onPress={() => handleCategoryPress(item.id)}
     >
-      <Text style={styles.categoryIcon}>{item.icon}</Text>
-      <Text style={[
-        styles.categoryName,
-        selectedCategory === item.id && styles.selectedCategoryText,
-      ]}>
+      <Text className="text-base mb-1">{item.icon}</Text>
+      <Text className={`text-xs font-semibold ${selectedCategory === item.id ? 'text-white' : ''}`}>
         {item.name}
       </Text>
     </TouchableOpacity>
   );
 
   const renderVendor = ({ item }) => (
-    <Card style={styles.resultCard} onPress={() => handleVendorPress(item)}>
-      <View style={styles.vendorContent}>
-        <Image source={{ uri: item.image }} style={styles.vendorImage} />
-        <CardContent style={styles.vendorInfo}>
-          <Text style={styles.vendorName}>{item.name}</Text>
-          <View style={styles.vendorMeta}>
-            <Text style={styles.vendorRating}>⭐ {item.rating}</Text>
-            <Text style={styles.vendorTime}>⏰ {item.time}</Text>
-            <Text style={styles.vendorDistance}>• {item.distance}</Text>
+    <Card className="mb-3 p-4" onPress={() => handleVendorPress(item)}>
+      <View className="flex-row">
+        <Image source={{ uri: item.image }} className="w-[60px] h-[60px] rounded-lg mr-3" />
+        <CardContent className="flex-1 p-0">
+          <Text className="text-base font-semibold text-slate-800 mb-1">{item.name}</Text>
+          <View className="flex-row items-center mb-1">
+            <Text className="text-xs text-slate-500 mr-3">⭐ {item.rating}</Text>
+            <Text className="text-xs text-slate-500 mr-3">⏰ {item.time}</Text>
+            <Text className="text-xs text-slate-500">• {item.distance}</Text>
           </View>
-          <Text style={styles.vendorOffers}>{item.offers}</Text>
-          <Text style={styles.vendorPrice}>{item.price}</Text>
+          <Text className="text-[10px] bg-green-100 text-green-600 px-1.5 py-0.5 rounded self-start font-semibold mb-1">{item.offers}</Text>
+          <Text className="text-xs text-slate-500">{item.price}</Text>
         </CardContent>
       </View>
     </Card>
   );
 
   const renderMenuItem = ({ item }) => (
-    <Card style={styles.resultCard}>
-      <View style={styles.itemContent}>
-        <Image source={{ uri: 'https://images.unsplash.com/photo-1648192312898-838f9b322f47?w=100' }} style={styles.itemImage} />
-        <CardContent style={styles.itemInfo}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemVendor}>{item.vendorName}</Text>
-          <Text style={styles.itemPrice}>₹{item.price}</Text>
+    <Card className="mb-3 p-4">
+      <View className="flex-row items-center">
+        <Image source={{ uri: 'https://images.unsplash.com/photo-1648192312898-838f9b322f47?w=100' }} className="w-[50px] h-[50px] rounded-lg mr-3" />
+        <CardContent className="flex-1 p-0">
+          <Text className="text-sm font-semibold text-slate-800 mb-0.5">{item.name}</Text>
+          <Text className="text-xs text-slate-500 mb-1">{item.vendorName}</Text>
+          <Text className="text-sm text-green-500 font-semibold">₹{item.price}</Text>
         </CardContent>
         <Button
           title="Add"
           onPress={() => handleAddToCart(item)}
           size="small"
-          style={styles.addButton}
+          className="bg-green-500 px-3"
         />
       </View>
     </Card>
   );
 
+  const FilterModal = () => {
+    const [tempFilters, setTempFilters] = useState(filters);
+
+    return (
+      <Modal
+        visible={showFilters}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowFilters(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white rounded-t-3xl p-6 h-[70%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold text-slate-800">Filters</Text>
+              <TouchableOpacity onPress={() => setShowFilters(false)}>
+                <Text className="text-slate-500 text-lg">✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              {/* Veg Only */}
+              <View className="mb-6">
+                <Text className="text-base font-semibold text-slate-800 mb-3">Dietary</Text>
+                <TouchableOpacity
+                  className={`flex-row items-center p-3 rounded-xl border ${tempFilters.vegOnly ? 'bg-green-50 border-green-500' : 'bg-white border-slate-200'}`}
+                  onPress={() => setTempFilters({ ...tempFilters, vegOnly: !tempFilters.vegOnly })}
+                >
+                  <Text className="mr-2">🥬</Text>
+                  <Text className={`font-medium ${tempFilters.vegOnly ? 'text-green-700' : 'text-slate-700'}`}>Pure Veg</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Rating */}
+              <View className="mb-6">
+                <Text className="text-base font-semibold text-slate-800 mb-3">Rating</Text>
+                <View className="flex-row flex-wrap">
+                  {[4.0, 4.5].map((rating) => (
+                    <TouchableOpacity
+                      key={rating}
+                      className={`mr-3 mb-3 px-4 py-2 rounded-full border ${tempFilters.rating === rating ? 'bg-green-500 border-green-500' : 'bg-white border-slate-200'}`}
+                      onPress={() => setTempFilters({ ...tempFilters, rating: tempFilters.rating === rating ? null : rating })}
+                    >
+                      <Text className={`font-medium ${tempFilters.rating === rating ? 'text-white' : 'text-slate-700'}`}>
+                        {rating}+ ⭐
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* Price Range */}
+              <View className="mb-6">
+                <Text className="text-base font-semibold text-slate-800 mb-3">Price</Text>
+                <View className="flex-row flex-wrap">
+                  {[
+                    { id: 'under_100', label: 'Under ₹100' },
+                    { id: '100_300', label: '₹100 - ₹300' },
+                    { id: 'over_300', label: 'Over ₹300' }
+                  ].map((range) => (
+                    <TouchableOpacity
+                      key={range.id}
+                      className={`mr-3 mb-3 px-4 py-2 rounded-full border ${tempFilters.priceRange === range.id ? 'bg-green-500 border-green-500' : 'bg-white border-slate-200'}`}
+                      onPress={() => setTempFilters({ ...tempFilters, priceRange: tempFilters.priceRange === range.id ? null : range.id })}
+                    >
+                      <Text className={`font-medium ${tempFilters.priceRange === range.id ? 'text-white' : 'text-slate-700'}`}>
+                        {range.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </ScrollView>
+
+            <View className="flex-row gap-4 pt-4 border-t border-slate-100">
+              <Button
+                title="Reset"
+                onPress={() => setTempFilters({ rating: null, vegOnly: false, priceRange: null })}
+                className="flex-1 bg-slate-200"
+                textClassName="text-slate-800"
+              />
+              <Button
+                title="Apply Filters"
+                onPress={() => applyFilters(tempFilters)}
+                className="flex-1 bg-green-500"
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-slate-200">
         <TouchableOpacity
-          style={styles.backButton}
+          className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text className="text-lg text-slate-500">←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Search</Text>
-        <View style={{ width: 40 }} />
+        <Text className="text-lg font-bold text-slate-800">Search</Text>
+        <View className="w-10" />
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for food, drinks, vendors..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onSubmitEditing={handleSearch}
-          placeholderTextColor="#64748b"
-        />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchIcon}>🔍</Text>
+      {/* Search Bar & Filter Button */}
+      <View className="flex-row items-center mx-4 my-3 gap-3">
+        <View className="flex-1 flex-row items-center bg-white rounded-xl px-4 py-1 shadow-sm elevation-2">
+          <TextInput
+            className="flex-1 text-base text-slate-800 py-2"
+            placeholder="Search for food, drinks, vendors..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            placeholderTextColor="#64748b"
+          />
+          <TouchableOpacity className="p-2" onPress={handleSearch}>
+            <Text className="text-lg text-slate-500">🔍</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          className={`w-12 h-12 rounded-xl items-center justify-center shadow-sm elevation-2 ${filters.rating || filters.vegOnly || filters.priceRange ? 'bg-green-500' : 'bg-white'
+            }`}
+          onPress={() => setShowFilters(true)}
+        >
+          <Text className="text-xl">⚙️</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Categories */}
-        <View style={styles.categoriesSection}>
+        <View className="mb-4">
           <FlatList
             data={categories}
             renderItem={renderCategory}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesList}
+            contentContainerClassName="py-2"
           />
         </View>
+
+        {/* Active Filters Chips */}
+        {(filters.rating || filters.vegOnly || filters.priceRange) && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4 flex-row">
+            {filters.vegOnly && (
+              <View className="bg-green-100 px-3 py-1 rounded-full mr-2 flex-row items-center">
+                <Text className="text-green-700 text-xs font-medium mr-1">Pure Veg</Text>
+                <TouchableOpacity onPress={() => applyFilters({ ...filters, vegOnly: false })}>
+                  <Text className="text-green-700 text-xs">✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {filters.rating && (
+              <View className="bg-green-100 px-3 py-1 rounded-full mr-2 flex-row items-center">
+                <Text className="text-green-700 text-xs font-medium mr-1">{filters.rating}+ ⭐</Text>
+                <TouchableOpacity onPress={() => applyFilters({ ...filters, rating: null })}>
+                  <Text className="text-green-700 text-xs">✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {filters.priceRange && (
+              <View className="bg-green-100 px-3 py-1 rounded-full mr-2 flex-row items-center">
+                <Text className="text-green-700 text-xs font-medium mr-1">
+                  {filters.priceRange === 'under_100' ? '< ₹100' : filters.priceRange === '100_300' ? '₹100-300' : '> ₹300'}
+                </Text>
+                <TouchableOpacity onPress={() => applyFilters({ ...filters, priceRange: null })}>
+                  <Text className="text-green-700 text-xs">✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </ScrollView>
+        )}
 
         {/* Results */}
         {(results.vendors.length > 0 || results.items.length > 0) && (
           <>
             {/* Vendors */}
             {results.vendors.length > 0 && (
-              <View style={styles.resultsSection}>
-                <Text style={styles.sectionTitle}>Restaurants ({results.vendors.length})</Text>
+              <View className="mb-6">
+                <Text className="text-lg font-bold text-slate-800 mb-4">Restaurants ({results.vendors.length})</Text>
                 <FlatList
                   data={results.vendors}
                   renderItem={renderVendor}
@@ -205,8 +352,8 @@ const SearchScreen = ({ navigation, route }) => {
 
             {/* Menu Items */}
             {results.items.length > 0 && (
-              <View style={styles.resultsSection}>
-                <Text style={styles.sectionTitle}>Menu Items ({results.items.length})</Text>
+              <View className="mb-6">
+                <Text className="text-lg font-bold text-slate-800 mb-4">Menu Items ({results.items.length})</Text>
                 <FlatList
                   data={results.items}
                   renderItem={renderMenuItem}
@@ -219,272 +366,41 @@ const SearchScreen = ({ navigation, route }) => {
         )}
 
         {/* No Results */}
-        {!loading && searchQuery && results.vendors.length === 0 && results.items.length === 0 && (
-          <View style={styles.noResults}>
-            <Text style={styles.noResultsIcon}>🔍</Text>
-            <Text style={styles.noResultsTitle}>No results found</Text>
-            <Text style={styles.noResultsText}>
-              Try searching for different keywords or check your spelling
+        {!loading && (searchQuery || filters.rating || filters.vegOnly || filters.priceRange) && results.vendors.length === 0 && results.items.length === 0 && (
+          <View className="items-center py-12">
+            <Text className="text-5xl mb-4">🔍</Text>
+            <Text className="text-lg font-bold text-slate-800 mb-2">No results found</Text>
+            <Text className="text-sm text-slate-500 text-center px-8">
+              Try adjusting your search or filters
             </Text>
           </View>
         )}
 
         {/* Search Suggestions */}
-        {!searchQuery && (
-          <View style={styles.suggestions}>
-            <Text style={styles.sectionTitle}>Popular Searches</Text>
+        {!searchQuery && !filters.rating && !filters.vegOnly && !filters.priceRange && (
+          <View className="mt-4">
+            <Text className="text-lg font-bold text-slate-800 mb-4">Popular Searches</Text>
             {['Pizza', 'Burger', 'Coffee', 'Ice Cream', 'Sandwich', 'Pasta'].map((suggestion, index) => (
               <TouchableOpacity
                 key={index}
-                style={styles.suggestionItem}
+                className="bg-white rounded-lg p-4 mb-2"
                 onPress={() => {
                   setSearchQuery(suggestion);
                   performSearch(suggestion);
                 }}
               >
-                <Text style={styles.suggestionText}>{suggestion}</Text>
+                <Text className="text-base text-slate-800">{suggestion}</Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
 
-        <View style={styles.bottomPadding} />
+        <View className="h-5" />
       </ScrollView>
+
+      <FilterModal />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: '#64748b',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    marginHorizontal: 16,
-    marginVertical: 12,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-    paddingVertical: 8,
-  },
-  searchButton: {
-    padding: 8,
-  },
-  searchIcon: {
-    fontSize: 18,
-    color: '#64748b',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  categoriesSection: {
-    marginBottom: 16,
-  },
-  categoriesList: {
-    paddingVertical: 8,
-  },
-  categoryItem: {
-    alignItems: 'center',
-    marginRight: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  selectedCategory: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
-  },
-  categoryIcon: {
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  categoryName: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  selectedCategoryText: {
-    color: '#ffffff',
-  },
-  resultsSection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  resultCard: {
-    marginBottom: 12,
-    padding: 16,
-  },
-  vendorContent: {
-    flexDirection: 'row',
-  },
-  vendorImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  vendorInfo: {
-    flex: 1,
-    padding: 0,
-  },
-  vendorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  vendorMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  vendorRating: {
-    fontSize: 12,
-    color: '#64748b',
-    marginRight: 12,
-  },
-  vendorTime: {
-    fontSize: 12,
-    color: '#64748b',
-    marginRight: 12,
-  },
-  vendorDistance: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  vendorOffers: {
-    fontSize: 10,
-    backgroundColor: '#dcfce7',
-    color: '#16a34a',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  vendorPrice: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  itemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  itemInfo: {
-    flex: 1,
-    padding: 0,
-  },
-  itemName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 2,
-  },
-  itemVendor: {
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 4,
-  },
-  itemPrice: {
-    fontSize: 14,
-    color: '#22c55e',
-    fontWeight: '600',
-  },
-  addButton: {
-    backgroundColor: '#22c55e',
-    paddingHorizontal: 12,
-  },
-  noResults: {
-    alignItems: 'center',
-    paddingVertical: 48,
-  },
-  noResultsIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  noResultsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  noResultsText: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-    paddingHorizontal: 32,
-  },
-  suggestions: {
-    marginTop: 16,
-  },
-  suggestionItem: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 8,
-  },
-  suggestionText: {
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  bottomPadding: {
-    height: 20,
-  },
-});
 
 export default SearchScreen;

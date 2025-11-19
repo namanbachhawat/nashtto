@@ -1,41 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import AppTheme from '../theme';
+import { useState } from 'react';
+import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const TrackingScreen = () => {
+const TrackingScreen = ({ navigation }) => {
   const [orderStatus, setOrderStatus] = useState('preparing');
+  const { width } = Dimensions.get('window');
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'confirmed':
-        return '#22c55e';
-      case 'preparing':
-        return '#f59e0b';
-      case 'ready':
-        return '#3b82f6';
-      case 'picked_up':
-        return '#8b5cf6';
-      case 'delivered':
-        return '#10b981';
-      default:
-        return '#6b7280';
+      case 'confirmed': return 'bg-green-500';
+      case 'preparing': return 'bg-amber-500';
+      case 'ready': return 'bg-blue-500';
+      case 'picked_up': return 'bg-violet-500';
+      case 'delivered': return 'bg-emerald-500';
+      default: return 'bg-slate-500';
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusTextColor = (status) => {
     switch (status) {
-      case 'confirmed':
-        return '✓';
-      case 'preparing':
-        return '👨‍🍳';
-      case 'ready':
-        return '🍽️';
-      case 'picked_up':
-        return '🚗';
-      case 'delivered':
-        return '🏠';
-      default:
-        return '○';
+      case 'confirmed': return 'text-green-500';
+      case 'preparing': return 'text-amber-500';
+      case 'ready': return 'text-blue-500';
+      case 'picked_up': return 'text-violet-500';
+      case 'delivered': return 'text-emerald-500';
+      default: return 'text-slate-500';
     }
   };
 
@@ -50,289 +39,160 @@ const TrackingScreen = () => {
   const currentStepIndex = trackingSteps.findIndex(step => step.id === orderStatus);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Order Tracking</Text>
-        <Text style={styles.headerSubtitle}>Order #12345</Text>
-      </View>
+    <View className="flex-1 bg-slate-50">
+      {/* Map Background (Mock) */}
+      <View className="absolute top-0 left-0 right-0 h-[55%] bg-slate-200 overflow-hidden">
+        <Image
+          source={{ uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop' }}
+          className="w-full h-full opacity-80"
+          resizeMode="cover"
+        />
 
-      {/* Restaurant Info */}
-      <View style={styles.restaurantCard}>
-        <View style={styles.restaurantInfo}>
-          <View>
-            <Text style={styles.restaurantName}>Green Garden Restaurant</Text>
-            <Text style={styles.restaurantAddress}>123 Food Street, City Center</Text>
-          </View>
-          <View style={styles.driverInfo}>
-            <Text style={styles.driverName}>Rajesh Kumar</Text>
-            <Text style={styles.driverTitle}>Delivery Partner</Text>
-          </View>
-        </View>
-      </View>
+        {/* Map Overlay Gradient */}
+        <View className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
 
-      {/* Delivery Address */}
-      <View style={styles.addressCard}>
-        <View style={styles.addressHeader}>
-          <Text style={styles.addressTitle}>Delivery Address</Text>
-          <View style={styles.etaBadge}>
-            <Text style={styles.etaText}>25 min</Text>
+        {/* Mock Markers */}
+        {/* Restaurant Marker */}
+        <View className="absolute top-[30%] left-[20%] items-center">
+          <View className="bg-white p-1.5 rounded-full shadow-md elevation-4 mb-1">
+            <Text className="text-xl">🏪</Text>
+          </View>
+          <View className="bg-white px-2 py-0.5 rounded-md shadow-sm">
+            <Text className="text-[10px] font-bold text-slate-700">Restaurant</Text>
           </View>
         </View>
-        <Text style={styles.addressText}>Apartment 4B, Sunrise Apartments, MG Road</Text>
+
+        {/* Driver Marker */}
+        <View className="absolute top-[45%] left-[45%] items-center">
+          <View className="bg-green-500 p-1.5 rounded-full shadow-md elevation-4 mb-1 border-2 border-white">
+            <Text className="text-xl">🛵</Text>
+          </View>
+          <View className="bg-white px-2 py-0.5 rounded-md shadow-sm">
+            <Text className="text-[10px] font-bold text-slate-700">Driver</Text>
+          </View>
+        </View>
+
+        {/* User Marker */}
+        <View className="absolute top-[60%] left-[75%] items-center">
+          <View className="bg-blue-500 p-1.5 rounded-full shadow-md elevation-4 mb-1 border-2 border-white">
+            <Text className="text-xl">🏠</Text>
+          </View>
+          <View className="bg-white px-2 py-0.5 rounded-md shadow-sm">
+            <Text className="text-[10px] font-bold text-slate-700">You</Text>
+          </View>
+        </View>
+
+        {/* Route Line (Mock SVG or View) */}
+        {/* Simple dashed line visualization using absolute positioned dots for simplicity */}
+        <View className="absolute top-[38%] left-[28%] w-2 h-2 bg-slate-400 rounded-full opacity-50" />
+        <View className="absolute top-[42%] left-[36%] w-2 h-2 bg-slate-400 rounded-full opacity-50" />
+        <View className="absolute top-[50%] left-[55%] w-2 h-2 bg-slate-400 rounded-full opacity-50" />
+        <View className="absolute top-[55%] left-[65%] w-2 h-2 bg-slate-400 rounded-full opacity-50" />
+
       </View>
 
-      {/* Tracking Steps */}
-      <View style={styles.trackingCard}>
-        <Text style={styles.trackingTitle}>Delivery Status</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.stepsContainer}>
-          {trackingSteps.map((step, index) => (
-            <View key={step.id} style={styles.stepContainer}>
-              <View style={[
-                styles.stepIcon,
-                { backgroundColor: getStatusColor(step.id) }
-              ]}>
-                <Text style={styles.stepIconText}>
-                  {index <= currentStepIndex ? getStatusIcon(step.id) : '○'}
-                </Text>
-              </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepLabel}>{step.label}</Text>
-                <Text style={styles.stepTime}>{step.time}</Text>
-              </View>
-              {index < trackingSteps.length - 1 && (
-                <View style={[
-                  styles.stepConnector,
-                  { backgroundColor: index <= currentStepIndex ? getStatusColor(step.id) : '#e5e7eb' }
-                ]} />
-              )}
+      {/* Header Overlay */}
+      <SafeAreaView className="absolute top-0 left-0 right-0 z-10">
+        <View className="flex-row items-center justify-between px-4 py-2">
+          <TouchableOpacity
+            className="w-10 h-10 bg-white rounded-full items-center justify-center shadow-sm elevation-2"
+            onPress={() => navigation.goBack()}
+          >
+            <Text className="text-lg text-slate-800">←</Text>
+          </TouchableOpacity>
+          <View className="bg-white px-4 py-2 rounded-full shadow-sm elevation-2">
+            <Text className="font-bold text-slate-800">Order #12345</Text>
+          </View>
+          <View className="w-10" />
+        </View>
+      </SafeAreaView>
+
+      {/* Bottom Sheet Content */}
+      <View className="flex-1 mt-[50%] bg-transparent">
+        <ScrollView
+          className="flex-1 bg-white rounded-t-3xl shadow-lg elevation-10 pt-6 px-5"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          {/* Drag Handle */}
+          <View className="self-center w-12 h-1.5 bg-slate-200 rounded-full mb-6" />
+
+          {/* Estimated Time */}
+          <View className="flex-row justify-between items-center mb-6">
+            <View>
+              <Text className="text-sm text-slate-500 mb-1">Estimated Delivery</Text>
+              <Text className="text-2xl font-bold text-slate-800">25-30 Mins</Text>
             </View>
-          ))}
+            <View className="bg-green-50 px-4 py-2 rounded-xl">
+              <Text className="text-green-600 font-bold">On Time</Text>
+            </View>
+          </View>
+
+          {/* Current Status */}
+          <View className="mb-6">
+            <Text className="text-lg font-bold text-slate-800 mb-2">
+              {trackingSteps[currentStepIndex]?.label}
+            </Text>
+            <Text className="text-slate-500 leading-5">
+              Your order is being prepared by the restaurant chef. It will be picked up soon.
+            </Text>
+
+            {/* Progress Bar */}
+            <View className="h-2 bg-slate-100 rounded-full mt-4 overflow-hidden">
+              <View
+                className="h-full bg-green-500 rounded-full"
+                style={{ width: `${((currentStepIndex + 1) / trackingSteps.length) * 100}%` }}
+              />
+            </View>
+          </View>
+
+          {/* Driver Info */}
+          <View className="flex-row items-center p-4 bg-slate-50 rounded-xl mb-6 border border-slate-100">
+            <Image
+              source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+              className="w-12 h-12 rounded-full mr-4"
+            />
+            <View className="flex-1">
+              <Text className="text-base font-bold text-slate-800">Rajesh Kumar</Text>
+              <Text className="text-xs text-slate-500">Delivery Partner • 4.8 ⭐</Text>
+            </View>
+            <TouchableOpacity className="w-10 h-10 bg-green-500 rounded-full items-center justify-center shadow-sm elevation-2">
+              <Text className="text-xl">📞</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Timeline */}
+          <View className="mb-6">
+            <Text className="text-base font-bold text-slate-800 mb-4">Timeline</Text>
+            {trackingSteps.map((step, index) => (
+              <View key={step.id} className="flex-row mb-4 last:mb-0">
+                <View className="items-center mr-4">
+                  <View className={`w-3 h-3 rounded-full ${index <= currentStepIndex ? 'bg-green-500' : 'bg-slate-300'}`} />
+                  {index < trackingSteps.length - 1 && (
+                    <View className={`w-0.5 flex-1 my-1 ${index < currentStepIndex ? 'bg-green-500' : 'bg-slate-200'}`} />
+                  )}
+                </View>
+                <View className="flex-1 pb-4">
+                  <View className="flex-row justify-between items-center mb-1">
+                    <Text className={`text-sm font-semibold ${index <= currentStepIndex ? 'text-slate-800' : 'text-slate-400'}`}>
+                      {step.label}
+                    </Text>
+                    <Text className="text-xs text-slate-400">{step.time}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Order Details Button */}
+          <TouchableOpacity className="w-full py-4 border border-slate-200 rounded-xl items-center mb-4">
+            <Text className="text-slate-600 font-semibold">View Order Details</Text>
+          </TouchableOpacity>
+
         </ScrollView>
       </View>
-
-      {/* Current Status */}
-      <View style={styles.statusCard}>
-        <View style={styles.statusHeader}>
-          <Text style={styles.statusTitle}>Current Status</Text>
-          <Text style={[styles.statusText, { color: getStatusColor(orderStatus) }]}>
-            {trackingSteps[currentStepIndex]?.label}
-          </Text>
-        </View>
-        <Text style={styles.statusDescription}>
-          Your order is being prepared by the restaurant chef. Estimated delivery time is 25 minutes.
-        </Text>
-      </View>
-
-      {/* Call Driver Button */}
-      <TouchableOpacity style={styles.callButton}>
-        <Text style={styles.callButtonText}>Call Driver</Text>
-      </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppTheme.Colors.background,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: AppTheme.Colors.primary,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: AppTheme.Colors.white,
-    marginBottom: 5,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: AppTheme.Colors.white + '80',
-  },
-  restaurantCard: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: AppTheme.Colors.white,
-    borderRadius: 12,
-    shadowColor: AppTheme.Colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  restaurantInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  restaurantName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: AppTheme.Colors.text,
-    marginBottom: 5,
-  },
-  restaurantAddress: {
-    fontSize: 14,
-    color: AppTheme.Colors.textLight,
-  },
-  driverInfo: {
-    alignItems: 'flex-end',
-  },
-  driverName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AppTheme.Colors.text,
-    marginBottom: 2,
-  },
-  driverTitle: {
-    fontSize: 12,
-    color: AppTheme.Colors.textLight,
-  },
-  addressCard: {
-    margin: 16,
-    marginTop: 0,
-    padding: 16,
-    backgroundColor: AppTheme.Colors.white,
-    borderRadius: 12,
-    shadowColor: AppTheme.Colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  addressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  addressTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AppTheme.Colors.text,
-  },
-  etaBadge: {
-    backgroundColor: AppTheme.Colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  etaText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: AppTheme.Colors.white,
-  },
-  addressText: {
-    fontSize: 14,
-    color: AppTheme.Colors.textLight,
-  },
-  trackingCard: {
-    margin: 16,
-    marginTop: 0,
-    padding: 16,
-    backgroundColor: AppTheme.Colors.white,
-    borderRadius: 12,
-    shadowColor: AppTheme.Colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  trackingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AppTheme.Colors.text,
-    marginBottom: 16,
-  },
-  stepsContainer: {
-    marginLeft: -16,
-  },
-  stepContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  stepIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  stepIconText: {
-    fontSize: 18,
-  },
-  stepContent: {
-    alignItems: 'center',
-    marginLeft: 12,
-    marginRight: 20,
-    minWidth: 60,
-  },
-  stepLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: AppTheme.Colors.text,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  stepTime: {
-    fontSize: 10,
-    color: AppTheme.Colors.textLight,
-  },
-  stepConnector: {
-    width: 40,
-    height: 2,
-    marginLeft: 8,
-  },
-  statusCard: {
-    margin: 16,
-    marginTop: 0,
-    padding: 16,
-    backgroundColor: AppTheme.Colors.white,
-    borderRadius: 12,
-    shadowColor: AppTheme.Colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statusHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  statusTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AppTheme.Colors.text,
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  statusDescription: {
-    fontSize: 14,
-    color: AppTheme.Colors.textLight,
-    lineHeight: 20,
-  },
-  callButton: {
-    margin: 16,
-    marginTop: 0,
-    backgroundColor: AppTheme.Colors.primary,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  callButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AppTheme.Colors.white,
-  },
-});
 
 export default TrackingScreen;

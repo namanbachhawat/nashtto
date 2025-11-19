@@ -1,5 +1,4 @@
-import React from 'react';
-import { TextInput, StyleSheet, Text, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 export const Input = ({
   value,
@@ -9,52 +8,26 @@ export const Input = ({
   keyboardType = 'default',
   error,
   style,
+  className,
   ...props
 }) => {
   return (
-    <View style={styles.container}>
+    <View className="mb-4">
       <TextInput
-        style={[
-          styles.input,
-          error && styles.inputError,
-          style
-        ]}
+        className={`bg-white border rounded-xl py-4 px-4 text-base text-slate-800 ${error ? 'border-red-500' : 'border-slate-200'
+          } ${className || ''}`}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor="#94a3b8"
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
+        style={style}
         {...props}
       />
       {error && (
-        <Text style={styles.errorText}>{error}</Text>
+        <Text className="text-red-500 text-xs mt-1 ml-1">{error}</Text>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  input: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  inputError: {
-    borderColor: '#ef4444',
-  },
-  errorText: {
-    color: '#ef4444',
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-});

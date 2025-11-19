@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Alert,
+  ScrollView,
   Switch,
-  Image,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../components/Button';
-import { Card, CardContent } from '../components/Card';
 import api from '../services/api';
 
 const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(true);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadUserProfile();
@@ -113,74 +109,74 @@ const ProfileScreen = ({ navigation }) => {
   const renderMenuItem = (item) => (
     <TouchableOpacity
       key={item.id}
-      style={styles.menuItem}
+      className="flex-row items-center justify-between bg-white rounded-xl p-4 mb-2"
       onPress={item.onPress}
     >
-      <View style={styles.menuItemContent}>
-        <Text style={styles.menuIcon}>{item.icon}</Text>
-        <Text style={styles.menuTitle}>{item.title}</Text>
+      <View className="flex-row items-center">
+        <Text className="text-xl mr-3">{item.icon}</Text>
+        <Text className="text-base text-slate-800">{item.title}</Text>
       </View>
-      <Text style={styles.menuArrow}>›</Text>
+      <Text className="text-lg text-slate-500">›</Text>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-slate-200">
         <TouchableOpacity
-          style={styles.backButton}
+          className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text className="text-lg text-slate-500">←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <View style={{ width: 40 }} />
+        <Text className="text-lg font-bold text-slate-800">Profile</Text>
+        <View className="w-10" />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Profile Info */}
-        <View style={styles.profileSection}>
-          <View style={styles.profileCard}>
-            <View style={styles.avatarContainer}>
-              <Text style={styles.avatarText}>
+        <View className="mt-4">
+          <View className="flex-row items-center bg-white rounded-2xl p-5 shadow-sm elevation-4">
+            <View className="w-[60px] h-[60px] rounded-full bg-green-500 items-center justify-center mr-4">
+              <Text className="text-2xl font-bold text-white">
                 {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </Text>
             </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.userName}>{user?.name || 'Loading...'}</Text>
-              <Text style={styles.userPhone}>{user?.phone || ''}</Text>
-              <Text style={styles.userEmail}>{user?.email || ''}</Text>
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-slate-800 mb-1">{user?.name || 'Loading...'}</Text>
+              <Text className="text-sm text-slate-500 mb-0.5">{user?.phone || ''}</Text>
+              <Text className="text-sm text-slate-500">{user?.email || ''}</Text>
             </View>
           </View>
         </View>
 
         {/* Quick Stats */}
-        <View style={styles.statsSection}>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>12</Text>
-              <Text style={styles.statLabel}>Orders</Text>
+        <View className="mt-4">
+          <View className="flex-row bg-white rounded-xl p-4">
+            <View className="flex-1 items-center">
+              <Text className="text-xl font-bold text-green-500 mb-1">12</Text>
+              <Text className="text-xs text-slate-500">Orders</Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>₹2,450</Text>
-              <Text style={styles.statLabel}>Spent</Text>
+            <View className="flex-1 items-center">
+              <Text className="text-xl font-bold text-green-500 mb-1">₹2,450</Text>
+              <Text className="text-xs text-slate-500">Spent</Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>4.8</Text>
-              <Text style={styles.statLabel}>Rating</Text>
+            <View className="flex-1 items-center">
+              <Text className="text-xl font-bold text-green-500 mb-1">4.8</Text>
+              <Text className="text-xs text-slate-500">Rating</Text>
             </View>
           </View>
         </View>
 
         {/* Settings */}
-        <View style={styles.settingsSection}>
-          <Text style={styles.sectionTitle}>Settings</Text>
+        <View className="mt-6">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Settings</Text>
 
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingIcon}>🔔</Text>
-              <Text style={styles.settingTitle}>Push Notifications</Text>
+          <View className="flex-row items-center justify-between bg-white rounded-xl p-4 mb-2">
+            <View className="flex-row items-center">
+              <Text className="text-xl mr-3">🔔</Text>
+              <Text className="text-base text-slate-800">Push Notifications</Text>
             </View>
             <Switch
               value={notifications}
@@ -190,223 +186,43 @@ const ProfileScreen = ({ navigation }) => {
             />
           </View>
 
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingIcon}>🌍</Text>
-              <Text style={styles.settingTitle}>Language</Text>
+          <View className="flex-row items-center justify-between bg-white rounded-xl p-4 mb-2">
+            <View className="flex-row items-center">
+              <Text className="text-xl mr-3">🌍</Text>
+              <Text className="text-base text-slate-800">Language</Text>
             </View>
-            <Text style={styles.settingValue}>English</Text>
+            <Text className="text-sm text-slate-500">English</Text>
           </View>
 
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingIcon}>💱</Text>
-              <Text style={styles.settingTitle}>Currency</Text>
+          <View className="flex-row items-center justify-between bg-white rounded-xl p-4 mb-2">
+            <View className="flex-row items-center">
+              <Text className="text-xl mr-3">💱</Text>
+              <Text className="text-base text-slate-800">Currency</Text>
             </View>
-            <Text style={styles.settingValue}>INR</Text>
+            <Text className="text-sm text-slate-500">INR</Text>
           </View>
         </View>
 
         {/* Menu Items */}
-        <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>Account</Text>
+        <View className="mt-6">
+          <Text className="text-lg font-bold text-slate-800 mb-4">Account</Text>
           {menuItems.map(renderMenuItem)}
         </View>
 
         {/* Logout */}
-        <View style={styles.logoutSection}>
+        <View className="mt-6 mb-4">
           <Button
             title="Logout"
             onPress={handleLogout}
             variant="outline"
-            style={styles.logoutButton}
+            className="border-red-500"
           />
         </View>
 
-        <View style={styles.bottomPadding} />
+        <View className="h-5" />
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: '#64748b',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  profileSection: {
-    marginTop: 16,
-  },
-  profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  avatarContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#22c55e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  avatarText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  userPhone: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 2,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  statsSection: {
-    marginTop: 16,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#22c55e',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  settingsSection: {
-    marginTop: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-  },
-  settingContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  settingIcon: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  settingTitle: {
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  settingValue: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  menuSection: {
-    marginTop: 24,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-  },
-  menuItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  menuIcon: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  menuTitle: {
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  menuArrow: {
-    fontSize: 18,
-    color: '#64748b',
-  },
-  logoutSection: {
-    marginTop: 24,
-    marginBottom: 16,
-  },
-  logoutButton: {
-    borderColor: '#ef4444',
-  },
-  bottomPadding: {
-    height: 20,
-  },
-});
 
 export default ProfileScreen;
